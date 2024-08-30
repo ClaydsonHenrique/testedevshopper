@@ -7,9 +7,9 @@ import {
 } from "sequelize";
 import db from "./index";
 
-class uploadImage extends Model<
-  InferAttributes<uploadImage>,
-  InferCreationAttributes<uploadImage>
+class UploadImage extends Model<
+  InferAttributes<UploadImage>,
+  InferCreationAttributes<UploadImage>
 > {
   declare id: CreationOptional<number>;
   declare image: string;
@@ -18,7 +18,7 @@ class uploadImage extends Model<
   declare measureType: string;
 }
 
-uploadImage.init(
+UploadImage.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -48,9 +48,10 @@ uploadImage.init(
   },
   {
     sequelize: db,
+    tableName: "uploads",
     modelName: "uploadImage",
     timestamps: false,
   }
 );
 
-export default uploadImage;
+export default UploadImage;

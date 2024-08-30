@@ -1,31 +1,47 @@
-import { IConsultas } from "../interface/IUpload";
+import uploadModel from "../database/models/01-upload.model";
+const { v4: uuid } = require("uuid");
+const fs = require("fs");
+const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const fs = require("fs").promises;
+require("dotenv").config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const imagemPath = path.join(__dirname, "..", "imagens", "agua.jpg");
+const imagemFile = fs.readFileSync(imagemPath).toString("base64");
 
-const img =
-  "iVBORw0KGgoAAAANSUhEUgAAABQAAAAVCAYAAACqmgfMAAAAAXNSR0IArs4c6QAAAO9JREFUOBGVkzsOwjAMREuOguMo6Si6SQnyATlUL2BO4M91uJqsiZ6cDgjRJe7ItgvPw4CxVAjP8B4X20xQWhJ+ABkOAKj9IjD2owJFP9P+4BgO6MlMFID0VoFlFNAnLRM0wj4SV3GcmShACwTaMe5xObAuXtAFRITRSIqkthU4cp5UVTcDICGLmJHDTcn9rIYQafQACW0Yj7q1dbbA6GRMX0b7iYbVqsfEZJvdpIBs2JmKwcQqnp7f7kM5H1v4H+gAAAABJRU5ErkJggg==";
-
-const decodeBase64 = async (base64: string) => {
-  console.log("verificando img", base64);
-  const buf = Buffer.from(base64, "base64").toString("utf-8");
-
-  await fs.writeFile("src/imagens/imagem.png", buf, (error: Error) => {
-    if (error) {
-      console.error("Invalid", error);
-    } else {
-      console.log("File created");
-      return true;
-    }
-  });
-  return base64;
+const imageGenerativePart = (base64: string, mimeType: string) => {
+  return {
+    inlineData: {
+      data: base64,
+      mimeType,
+    },
+  };
 };
 
 const uploadPostService = async () => {
-  const base64 = await decodeBase64(img);
-  console.log("verificando base64", base64);
-  return base64;
+  const modelIa = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = "quantos litros tem";
+  const mimeType = "image/jpeg";
+  const imagemPart = imageGenerativePart(imagemFile, mimeType);
+  const result = await modelIa.generateContent([prompt, imagemPart]);
+  const image = result.response.text();
+
+  const data = new Date();
+  const mounth = data.getMonth();
+  console.log(mounth);
+
+  // const createDatabase = await uploadModel.create({
+  //   image: imagemFile,
+  //   customerCode: uuid(),
+  //   measureDatetime: data,
+  //   measureType: 'Water'
+  // });
+
+  const createDatabase = await uploadModel.findAll();
+
+  console.log(createDatabase);
+  return image;
 };
 
 export default uploadPostService;
