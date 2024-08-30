@@ -11,7 +11,7 @@ exports.default = {
                 autoIncrement: true,
             },
             image: {
-                type: sequelize_1.DataTypes.STRING,
+                type: sequelize_1.DataTypes.TEXT,
                 allowNull: false,
             },
             customerCode: {

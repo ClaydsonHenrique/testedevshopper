@@ -13,40 +13,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _01_upload_model_1 = __importDefault(require("../database/models/01-upload.model"));
+const image_utils_1 = require("../utils/image.utils");
 const { v4: uuid } = require("uuid");
 const fs = require("fs");
 const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const imagemPath = path.join(__dirname, "..", "imagens", "agua.jpg");
-const imagemFile = fs.readFileSync(imagemPath).toString("base64");
-const imageGenerativePart = (base64, mimeType) => {
-    return {
-        inlineData: {
-            data: base64,
-            mimeType,
-        },
-    };
-};
-const uploadPostService = () => __awaiter(void 0, void 0, void 0, function* () {
-    const modelIa = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const uploadPostService = (base64, customer_code, measure_datatime, measure_type) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileName = `${uuid()}.png`;
+    const base64data = base64.replace(/^data:image\/\w+;base64,/, "");
+    const imagePath = (0, image_utils_1.convertBase64InImage)(base64data, fileName);
+    const image_url = (0, image_utils_1.generateLinkForImage)(fileName);
+    const generativeModel = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+    });
     const prompt = "quantos litros tem";
     const mimeType = "image/jpeg";
-    const imagemPart = imageGenerativePart(imagemFile, mimeType);
-    const result = yield modelIa.generateContent([prompt, imagemPart]);
-    const image = result.response.text();
-    const data = new Date();
-    const mounth = data.getMonth();
+    const imagePart = (0, image_utils_1.saveBase64AsImage)(base64data, mimeType);
+    const result = yield generativeModel.generateContent([prompt, imagePart]);
+    const measure_value = result.response.text();
+    const currentDate = new Date();
+    const mounth = currentDate.getMonth();
     console.log(mounth);
-    // const createDatabase = await uploadModel.create({
-    //   image: imagemFile,
-    //   customerCode: uuid(),
-    //   measureDatetime: data,
-    //   measureType: 'Water'
-    // });
-    const createDatabase = yield _01_upload_model_1.default.findAll();
-    console.log(createDatabase);
-    return image;
+    const createdRecord = yield _01_upload_model_1.default.create({
+        image: base64,
+        customerCode: customer_code,
+        measureDatetime: measure_datatime,
+        measureType: measure_type,
+    });
+    const measure_uuid = uuid();
+    return {
+        image_url,
+        measure_value,
+        measure_uuid,
+    };
 });
 exports.default = uploadPostService;

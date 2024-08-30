@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const UploadPost_service_1 = __importDefault(require("../services/UploadPost.service"));
 const uploadControler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const dados = yield (0, UploadPost_service_1.default)();
+    const { image, customer_code, measure_datatime, measure_type } = req.body;
+    const dados = yield (0, UploadPost_service_1.default)(image, customer_code, measure_datatime, measure_type);
     console.log(dados);
     res.status(201).json(dados);
 });

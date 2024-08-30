@@ -27,7 +27,7 @@ UploadImage.init(
       autoIncrement: true,
     },
     image: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     customerCode: {
