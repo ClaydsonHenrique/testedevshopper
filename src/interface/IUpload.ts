@@ -4,6 +4,8 @@ export  interface IUpload {
   customerCode: string;
   measureDatetime: Date;
   measureType: string;
+  measure_uuid: string;
+  confirmed_value: boolean;
 }
 
 export  interface IConsultas {

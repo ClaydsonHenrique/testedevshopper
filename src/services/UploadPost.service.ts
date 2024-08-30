@@ -20,9 +20,8 @@ const uploadPostService = async (
   measure_datatime: Date,
   measure_type: string
 ) => {
-  
   const fileName = `${uuid()}.png`;
-   const base64data = base64.replace(/^data:image\/\w+;base64,/, "");
+  const base64data = base64.replace(/^data:image\/\w+;base64,/, "");
   const imagePath = convertBase64InImage(base64data, fileName);
   const image_url = generateLinkForImage(fileName);
 
@@ -40,15 +39,18 @@ const uploadPostService = async (
 
   const mounth = currentDate.getMonth();
   console.log(mounth);
-
-  const createdRecord = await uploadModel.create({
+  const measure_uuid = uuid();
+  
+  await uploadModel.create({
     image: base64,
     customerCode: customer_code,
     measureDatetime: measure_datatime,
     measureType: measure_type,
+    confirmed_value: false,
+    measure_uuid,
   });
 
-  const measure_uuid = uuid();
+
 
   return {
     image_url,

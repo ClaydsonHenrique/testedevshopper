@@ -29,6 +29,14 @@ export default {
         allowNull: false,
         field: "measure_type",
       },
+      measure_uuid: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      confirmed_value: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
     });
   },
   down(queryInterface: QueryInterface) {
