@@ -29,28 +29,28 @@ const uploadPostService = async (
     model: "gemini-1.5-flash",
   });
 
-  const prompt = "quantos litros tem";
+  const prompt = "quantos litros tem ?, apenas a quantidade";
   const mimeType = "image/jpeg";
   const imagePart = saveBase64AsImage(base64data, mimeType);
   const result = await generativeModel.generateContent([prompt, imagePart]);
-  const measure_value = result.response.text();
+  console.log(result.response.text());
+  const measure_value = result.response.text().match(/\d+/g)?.join("") || "0";
 
   const currentDate = new Date();
 
   const mounth = currentDate.getMonth();
   console.log(mounth);
   const measure_uuid = uuid();
-  
+
   await uploadModel.create({
     image: base64,
     customerCode: customer_code,
     measureDatetime: measure_datatime,
     measureType: measure_type,
-    confirmed_value: false,
+    measure_value: Number(measure_value),
+    value_confirmed: false,
     measure_uuid,
   });
-
-
 
   return {
     image_url,

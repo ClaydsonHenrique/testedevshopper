@@ -16,8 +16,9 @@ class UploadImage extends Model<
   declare customerCode: string;
   declare measureDatetime: Date;
   declare measureType: string;
-  declare confirmed_value: boolean;
+  declare value_confirmed: boolean;
   declare measure_uuid: string;
+  declare measure_value: number;
 }
 
 UploadImage.init(
@@ -51,7 +52,11 @@ UploadImage.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    confirmed_value: {
+    measure_value: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    value_confirmed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },

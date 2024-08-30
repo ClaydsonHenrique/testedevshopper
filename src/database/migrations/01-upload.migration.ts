@@ -33,7 +33,11 @@ export default {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      confirmed_value: {
+      measure_value: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      value_confirmed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },

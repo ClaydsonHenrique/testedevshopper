@@ -5,7 +5,8 @@ export  interface IUpload {
   measureDatetime: Date;
   measureType: string;
   measure_uuid: string;
-  confirmed_value: boolean;
+  measure_value: string;
+  value_confirmed: boolean;
 }
 
 export  interface IConsultas {
