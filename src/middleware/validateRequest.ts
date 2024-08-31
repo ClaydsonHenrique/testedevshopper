@@ -20,7 +20,7 @@ const validateMeasurementRequest = async (
   // verificando se algum item esta vazio
   if (!image || !customer_code || !measure_datatime || !measure_type) {
     return res.status(status_error).json({
-      erro_code: errorCode,
+      error_code: errorCode,
       error_description:
         "Os dados fornecidos no corpo da requisição são inválidos",
     });
@@ -31,7 +31,7 @@ const validateMeasurementRequest = async (
     return res
       .status(status_error)
       .json({
-        erro_code: errorCode,
+        error_code: errorCode,
         error_description: "A imagem fornecida é inválido",
       });
   }
@@ -42,7 +42,7 @@ const validateMeasurementRequest = async (
     return res
       .status(status_error)
       .json({
-        erro_code: errorCode,
+        error_code: errorCode,
         error_description: "O customer_code é inválido",
       });
   }
@@ -52,7 +52,7 @@ const validateMeasurementRequest = async (
   if (!isValid(parsedDate)) {
     console.log("Invalid date:", measure_datatime);
     return res.status(status_error).json({
-      erro_code: errorCode,
+      error_code: errorCode,
       error_description: "O measure_datatime esta no formato inválido",
     });
   }
@@ -60,7 +60,7 @@ const validateMeasurementRequest = async (
   // verificando se measure_type é um tipo de medida valida
   if (measure_type != "WATER" && measure_type != "GAS") {
     return res.status(status_error).json({
-      erro_code: errorCode,
+      error_code: errorCode,
       error_description: "O tipo deve ser WATER ou GAS",
     });
   }
@@ -90,7 +90,7 @@ const validateMeasurementRequest = async (
   if (verifyDouble) {
     console.log("erro requisitcao duplicada");
     return res.status(409).json({
-      erro_code: "DOUBLE_REPORT",
+      error_code: "DOUBLE_REPORT",
       error_description: "Leitura do mês já realizada",
     });
   }
