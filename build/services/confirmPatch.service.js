@@ -13,24 +13,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Measures_models_1 = __importDefault(require("../database/models/Measures.models"));
-const confirmPatch = (measure_uuid, confirmed_value) => __awaiter(void 0, void 0, void 0, function* () {
-    const getModel = yield Measures_models_1.default.findOne({
+const confirmMeasure = (measureUuid, confirmedValue) => __awaiter(void 0, void 0, void 0, function* () {
+    const measureRecord = yield Measures_models_1.default.findOne({
         where: {
-            measure_uuid,
+            measure_uuid: measureUuid,
         },
     });
-    if (!getModel) {
+    if (!measureRecord) {
         return "Leitura não encontrada";
     }
-    const verifyValue = confirmed_value === getModel.measure_value ? true : false;
-    if (!verifyValue) {
-        yield getModel.update({
-            measure_value: confirmed_value,
+    const isValueSame = confirmedValue === measureRecord.measure_value;
+    if (!isValueSame) {
+        yield measureRecord.update({
+            measure_value: confirmedValue,
             value_confirmed: true,
         });
     }
-    yield getModel.update({
+    yield measureRecord.update({
         value_confirmed: true,
     });
 });
-exports.default = confirmPatch;
+exports.default = confirmMeasure;

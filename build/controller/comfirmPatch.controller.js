@@ -17,7 +17,10 @@ const confirmPatchController = (req, res) => __awaiter(void 0, void 0, void 0, f
     const { measure_uuid, confirmed_value } = req.body;
     const result = yield (0, confirmPatch_service_1.default)(measure_uuid, confirmed_value);
     if (result === "Leitura não encontrada") {
-        return res.status(404).json({ message: "Leitura do mês já realizada" });
+        return res.status(404).json({
+            erro_code: "MEASURE_NOT_FOUND",
+            error_description: "Leitura do mês já realizada",
+        });
     }
     return res.status(200).json({ success: true });
 });

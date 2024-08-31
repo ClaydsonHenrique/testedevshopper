@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const listMeasurements_service_1 = __importDefault(require("../services/listMeasurements.service"));
-const listCustomerMeasurer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const customer = req.params.customer_code;
+const listCustomerMeasurements = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const customerCode = req.params.customer_code;
     const measureType = req.query.measure_type;
-    ;
-    const getListCustomerMeasures = yield (0, listMeasurements_service_1.default)(customer, measureType || "");
-    res.status(200).json(getListCustomerMeasures);
+    const customerMeasurements = yield (0, listMeasurements_service_1.default)(customerCode, measureType || "");
+    if (!customerMeasurements || customerMeasurements.measures.length === 0) {
+        return res.status(404).json({ message: "Nenhuma leitura encontrada" });
+    }
+    return res.status(200).json(customerMeasurements);
 });
-exports.default = listCustomerMeasurer;
+exports.default = listCustomerMeasurements;

@@ -2,11 +2,11 @@ import Customers from "../database/models/Customers.models";
 import Measures from "../database/models/Measures.models";
 
 const getCustomerMeasurements = async (
-  costumer: string,
-  measures_type: string
+  customerCode: string,
+  measureType?: string
 ) => {
-  const getCustomer = await Customers.findOne({
-    where: { customerCode: costumer },
+  const customer = (await Customers.findOne({
+    where: { customerCode },
 
     include: [
       {
@@ -20,22 +20,22 @@ const getCustomerMeasurements = async (
     attributes: {
       exclude: ["id"],
     },
-  }) as any;
+  })) as any;
 
-  if (!getCustomer) {
-    throw new Error("Customer not found");
+  if (!customer) {
+    throw new Error("Customer não encontrado");
   }
 
-  if (measures_type && measures_type.length > 0) {
-    console.log('entrou aqui')
-    const measuresType = measures_type.toUpperCase();
-    const getCustomerMeasures = getCustomer.measures.filter(
-      (measure: Measures) => measure.measureType.toUpperCase() === measuresType
+  if (measureType && measureType.length > 0) {
+    console.log("entrou aqui");
+    const filteredMeasures = customer.measures.filter(
+      (measure: Measures) =>
+        measure.measureType.toUpperCase() === measureType.toUpperCase()
     );
-    getCustomer.measures = getCustomerMeasures;
+    customer.measures = filteredMeasures;
   }
 
-  return getCustomer;
+  return customer;
 };
 
 export default getCustomerMeasurements;

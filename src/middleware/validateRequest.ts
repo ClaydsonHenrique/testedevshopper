@@ -8,18 +8,19 @@ import config from "../database/config/database";
 
 const sequelize = new Sequelize(config);
 
-const validateRequest = async (
+const validateMeasurementRequest = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { image, customer_code, measure_datatime, measure_type } = req.body;
-  const erro_code = "INVALID_DATA";
+  const errorCode = "INVALID_DATA";
   const status_error = 400;
+
   // verificando se algum item esta vazio
   if (!image || !customer_code || !measure_datatime || !measure_type) {
     return res.status(status_error).json({
-      erro_code,
+      erro_code: errorCode,
       error_description:
         "Os dados fornecidos no corpo da requisição são inválidos",
     });
@@ -29,7 +30,10 @@ const validateRequest = async (
   if (!image.startsWith("data:image/")) {
     return res
       .status(status_error)
-      .json({ erro_code, error_description: "A imagem fornecida é inválido" });
+      .json({
+        erro_code: errorCode,
+        error_description: "A imagem fornecida é inválido",
+      });
   }
 
   // verificando se customer é strings
@@ -37,39 +41,39 @@ const validateRequest = async (
     console.log("erro customer");
     return res
       .status(status_error)
-      .json({ erro_code, error_description: "O customer_code é inválido" });
+      .json({
+        erro_code: errorCode,
+        error_description: "O customer_code é inválido",
+      });
   }
 
   // verificando se measure_datatime é uma data valida
   const parsedDate = parseISO(measure_datatime);
   if (!isValid(parsedDate)) {
     console.log("Invalid date:", measure_datatime);
-    return res
-      .status(status_error)
-      .json({ erro_code, error_description: "O measure_datatime esta no formato inválido" });
+    return res.status(status_error).json({
+      erro_code: errorCode,
+      error_description: "O measure_datatime esta no formato inválido",
+    });
   }
 
   // verificando se measure_type é um tipo de medida valida
   if (measure_type != "WATER" && measure_type != "GAS") {
-    return res
-      .status(status_error)
-      .json({
-        erro_code,
-        error_description: "O tipo deve ser WATER ou GAS",
-      });
+    return res.status(status_error).json({
+      erro_code: errorCode,
+      error_description: "O tipo deve ser WATER ou GAS",
+    });
   }
 
   // validando se ja foi feita a consulta do mesmo tipo no mes
 
   const measureDate = new Date(measure_datatime);
-  const month = measureDate.getMonth() + 1;
-  const year = measureDate.getFullYear();
 
   const verifyDouble = await Measures.findOne({
     include: [
       {
         model: Customers,
-        as: 'customer',
+        as: "customer",
       },
     ],
     where: {
@@ -94,4 +98,4 @@ const validateRequest = async (
   next();
 };
 
-export default validateRequest;
+export default validateMeasurementRequest;

@@ -1,28 +1,30 @@
 import Measures from "../database/models/Measures.models";
 
-const confirmPatch = async (measure_uuid: string, confirmed_value: number) => {
-  const getModel = await Measures.findOne({
+const confirmMeasure = async (
+  measureUuid: string,
+  confirmedValue: number
+): Promise<string | void> => {
+  const measureRecord = await Measures.findOne({
     where: {
-      measure_uuid,
+      measure_uuid: measureUuid,
     },
   });
-  
-  if(!getModel){
+
+  if (!measureRecord) {
     return "Leitura não encontrada";
   }
+  const isValueSame = confirmedValue === measureRecord.measure_value;
 
-  const verifyValue = confirmed_value === getModel.measure_value ? true : false;
-
-  if (!verifyValue) {
-    await getModel.update({
-      measure_value: confirmed_value,
+  if (!isValueSame) {
+    await measureRecord.update({
+      measure_value: confirmedValue,
       value_confirmed: true,
     });
   }
 
-  await getModel.update({
+  await measureRecord.update({
     value_confirmed: true,
   });
 };
 
-export default confirmPatch;
+export default confirmMeasure;

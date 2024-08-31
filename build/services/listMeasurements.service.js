@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Customers_models_1 = __importDefault(require("../database/models/Customers.models"));
 const Measures_models_1 = __importDefault(require("../database/models/Measures.models"));
-const getCustomerMeasurements = (costumer, measures_type) => __awaiter(void 0, void 0, void 0, function* () {
-    const getCustomer = yield Customers_models_1.default.findOne({
-        where: { customerCode: costumer },
+const getCustomerMeasurements = (customerCode, measureType) => __awaiter(void 0, void 0, void 0, function* () {
+    const customer = (yield Customers_models_1.default.findOne({
+        where: { customerCode },
         include: [
             {
                 model: Measures_models_1.default,
@@ -29,17 +29,15 @@ const getCustomerMeasurements = (costumer, measures_type) => __awaiter(void 0, v
         attributes: {
             exclude: ["id"],
         },
-    });
-    if (!getCustomer) {
-        throw new Error("Customer not found");
+    }));
+    if (!customer) {
+        throw new Error("Customer não encontrado");
     }
-    if (measures_type && measures_type.length > 0) {
-        console.log('entrou aqui');
-        const measuresType = measures_type.toUpperCase();
-        const getCustomerMeasures = getCustomer.measures.filter((measure) => measure.measureType.toUpperCase() === measuresType);
-        getCustomer.measures = getCustomerMeasures;
+    if (measureType && measureType.length > 0) {
+        console.log("entrou aqui");
+        const filteredMeasures = customer.measures.filter((measure) => measure.measureType.toUpperCase() === measureType.toUpperCase());
+        customer.measures = filteredMeasures;
     }
-    console.log(getCustomer);
-    return getCustomer;
+    return customer;
 });
 exports.default = getCustomerMeasurements;

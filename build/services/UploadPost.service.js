@@ -16,53 +16,50 @@ const Measures_models_1 = __importDefault(require("../database/models/Measures.m
 const Customers_models_1 = __importDefault(require("../database/models/Customers.models"));
 const image_utils_1 = require("../utils/image.utils");
 const { v4: uuid } = require("uuid");
-const fs = require("fs");
-const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const uploadPostService = (base64, customer_code, measure_datatime, measure_type) => __awaiter(void 0, void 0, void 0, function* () {
+const uploadPostService = (base64Image, customerCode, measurementDateTime, measurementType) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const fileName = `${uuid()}.png`;
-    const base64data = base64.replace(/^data:image\/\w+;base64,/, "");
-    const imagePath = (0, image_utils_1.convertBase64InImage)(base64data, fileName);
-    const image_url = (0, image_utils_1.generateLinkForImage)(fileName);
+    const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+    const imageUrl = (0, image_utils_1.generateLinkForImage)(fileName);
     const generativeModel = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
     });
     const prompt = "quantos litros tem ?, apenas a quantidade";
     const mimeType = "image/jpeg";
-    const imagePart = (0, image_utils_1.saveBase64AsImage)(base64data, mimeType);
+    const imagePart = (0, image_utils_1.saveBase64AsImage)(base64Data, mimeType);
     const result = yield generativeModel.generateContent([prompt, imagePart]);
-    console.log(result.response.text());
-    const measure_value = ((_a = result.response.text().match(/\d+/g)) === null || _a === void 0 ? void 0 : _a.join("")) || "0";
+    const measureValueText = result.response.text();
+    const measureValue = ((_a = measureValueText.match(/\d+/g)) === null || _a === void 0 ? void 0 : _a.join("")) || "0";
     const currentDate = new Date();
     const mounth = currentDate.getMonth();
     console.log(mounth);
     const measure_uuid = uuid();
     let isexistCustomers = yield Customers_models_1.default.findOne({
         where: {
-            customerCode: customer_code,
+            customerCode: customerCode,
         },
     });
     if (!isexistCustomers || isexistCustomers === null) {
         isexistCustomers = yield Customers_models_1.default.create({
-            customerCode: customer_code,
+            customerCode: customerCode,
         });
     }
-    console.log(isexistCustomers, 'veirifando se o erro esta aqui ');
+    console.log(isexistCustomers, "veirifando se o erro esta aqui ");
     yield Measures_models_1.default.create({
-        image: image_url,
+        image: imageUrl,
         customerId: isexistCustomers.id,
-        measureDatetime: measure_datatime,
-        measureType: measure_type,
-        measure_value: Number(measure_value),
+        measureDatetime: measurementDateTime,
+        measureType: measurementType,
+        measure_value: Number(measureValue),
         value_confirmed: false,
         measure_uuid,
     });
     return {
-        image_url,
-        measure_value,
+        image_url: imageUrl,
+        measure_value: measureValue,
         measure_uuid,
     };
 });

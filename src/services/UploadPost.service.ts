@@ -2,13 +2,10 @@ import Measures from "../database/models/Measures.models";
 import Customers from "../database/models/Customers.models";
 import {
   generateLinkForImage,
-  convertBase64InImage,
   saveBase64AsImage,
 } from "../utils/image.utils";
 
 const { v4: uuid } = require("uuid");
-const fs = require("fs");
-const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 require("dotenv").config();
@@ -16,15 +13,14 @@ require("dotenv").config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const uploadPostService = async (
-  base64: string,
-  customer_code: string,
-  measure_datatime: Date,
-  measure_type: string
+  base64Image: string,
+  customerCode: string,
+  measurementDateTime: Date,
+  measurementType: string
 ) => {
   const fileName = `${uuid()}.png`;
-  const base64data = base64.replace(/^data:image\/\w+;base64,/, "");
-  const imagePath = convertBase64InImage(base64data, fileName);
-  const image_url = generateLinkForImage(fileName);
+  const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+  const imageUrl = generateLinkForImage(fileName);
 
   const generativeModel = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
@@ -32,10 +28,12 @@ const uploadPostService = async (
 
   const prompt = "quantos litros tem ?, apenas a quantidade";
   const mimeType = "image/jpeg";
-  const imagePart = saveBase64AsImage(base64data, mimeType);
+  const imagePart = saveBase64AsImage(base64Data, mimeType);
+
   const result = await generativeModel.generateContent([prompt, imagePart]);
-  console.log(result.response.text());
-  const measure_value = result.response.text().match(/\d+/g)?.join("") || "0";
+
+   const measureValueText = result.response.text();
+   const measureValue = measureValueText.match(/\d+/g)?.join("") || "0";
 
   const currentDate = new Date();
 
@@ -45,29 +43,29 @@ const uploadPostService = async (
 
   let isexistCustomers = await Customers.findOne({
     where: {
-      customerCode: customer_code,
+      customerCode: customerCode,
     },
   });
 
   if (!isexistCustomers || isexistCustomers === null) {
     isexistCustomers = await Customers.create({
-      customerCode: customer_code,
+      customerCode: customerCode,
     });
   }
-  console.log(isexistCustomers, 'veirifando se o erro esta aqui ')
+  console.log(isexistCustomers, "veirifando se o erro esta aqui ");
   await Measures.create({
-    image: image_url,
+    image: imageUrl,
     customerId: isexistCustomers.id,
-    measureDatetime: measure_datatime,
-    measureType: measure_type,
-    measure_value: Number(measure_value),
+    measureDatetime: measurementDateTime,
+    measureType: measurementType,
+    measure_value: Number(measureValue),
     value_confirmed: false,
     measure_uuid,
   });
 
   return {
-    image_url,
-    measure_value,
+    image_url: imageUrl,
+    measure_value: measureValue,
     measure_uuid,
   };
 };

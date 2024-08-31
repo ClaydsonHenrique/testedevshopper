@@ -1,18 +1,21 @@
 import { Request, Response } from "express";
 import getCustomerMeasurements from "../services/listMeasurements.service";
 
-const listCustomerMeasurer = async (req: Request, res: Response) => {
-  const customer = req.params.customer_code;
+const listCustomerMeasurements = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const customerCode = req.params.customer_code;
   const measureType = req.query.measure_type as string | undefined;
 
-  const getListCustomerMeasures = await getCustomerMeasurements(
-    customer,
+  const customerMeasurements = await getCustomerMeasurements(
+    customerCode,
     measureType || ""
   );
-  if (!getCustomerMeasurements) {
+  if (!customerMeasurements || customerMeasurements.measures.length === 0) {
     return res.status(404).json({ message: "Nenhuma leitura encontrada" });
   }
-  res.status(200).json(getListCustomerMeasures);
+  return res.status(200).json(customerMeasurements);
 };
 
-export default listCustomerMeasurer;
+export default listCustomerMeasurements;
