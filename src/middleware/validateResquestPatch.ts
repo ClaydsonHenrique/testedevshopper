@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import uploadModel from "../database/models/01-upload.model";
+import Measures from "../database/models/Measures.models";
 
 const validateRequestPatch = async (
   req: Request,
@@ -24,7 +24,7 @@ const validateRequestPatch = async (
     });
   }
 
-  const getRequest = await uploadModel.findOne({ where: { measure_uuid } });
+  const getRequest = await Measures.findOne({ where: { measure_uuid } });
 
   if (!getRequest) {
     return res.status(404).json({

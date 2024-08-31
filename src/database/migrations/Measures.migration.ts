@@ -1,23 +1,23 @@
 import { DataTypes, Model, QueryInterface } from "sequelize";
 import { IUpload } from "../../interface/IUpload";
+import Customers from '../models/Customers.models';
 
 export default {
   up(queryInterface: QueryInterface) {
-    return queryInterface.createTable<Model<IUpload>>("uploads", {
+    return queryInterface.createTable<Model<IUpload>>("measures", {
       id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
       },
+      customerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       image: {
         type: DataTypes.TEXT,
         allowNull: false,
-      },
-      customerCode: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        field: "customer_code",
       },
       measureDatetime: {
         type: DataTypes.DATE,
@@ -43,7 +43,10 @@ export default {
       },
     });
   },
+  
+  
+  
   down(queryInterface: QueryInterface) {
-    return queryInterface.dropTable("uploads");
+    return queryInterface.dropTable("measures");
   },
 };

@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { Sequelize } from "sequelize";
 import { Op } from "sequelize";
 import { parseISO, isValid } from "date-fns";
-import uploadModel from "../database/models/01-upload.model";
+import Measures from "../database/models/Measures.models";
+import Customers from '../database/models/Customers.models';
 import config from "../database/config/database";
 
 const sequelize = new Sequelize(config);
@@ -64,9 +65,14 @@ const validateRequest = async (
   const month = measureDate.getMonth() + 1;
   const year = measureDate.getFullYear();
 
-  const verifyDouble = await uploadModel.findOne({
+  const verifyDouble = await Measures.findOne({
+    include: [
+      {
+        model: Customers,
+        as: 'customer',
+      },
+    ],
     where: {
-      customerCode: customer_code,
       measureType: measure_type,
       [Op.and]: [
         sequelize.where(

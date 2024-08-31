@@ -1,7 +1,12 @@
-export  interface IUpload {
+export interface ICustomers {
   id: number;
-  image: string;
   customerCode: string;
+}
+
+export interface IUpload {
+  id: number;
+  customerId: number;
+  image: string;
   measureDatetime: Date;
   measureType: string;
   measure_uuid: string;
@@ -9,7 +14,7 @@ export  interface IUpload {
   value_confirmed: boolean;
 }
 
-export  interface IConsultas {
+export interface IConsultas {
   image: string;
   customerCode: string;
   measureDatetime: Date;

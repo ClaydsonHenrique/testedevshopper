@@ -1,7 +1,7 @@
-import UploadImage from "../database/models/01-upload.model";
+import Measures from "../database/models/Measures.models";
 
 const confirmPatch = async (measure_uuid: string, confirmed_value: number) => {
-  const getModel = await UploadImage.findOne({
+  const getModel = await Measures.findOne({
     where: {
       measure_uuid,
     },

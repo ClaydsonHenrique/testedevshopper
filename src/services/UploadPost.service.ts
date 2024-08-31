@@ -1,4 +1,5 @@
-import uploadModel from "../database/models/01-upload.model";
+import Measures from "../database/models/Measures.models";
+import Customers from "../database/models/Customers.models";
 import {
   generateLinkForImage,
   convertBase64InImage,
@@ -42,9 +43,21 @@ const uploadPostService = async (
   console.log(mounth);
   const measure_uuid = uuid();
 
-  await uploadModel.create({
-    image: base64,
-    customerCode: customer_code,
+  let isexistCustomers = await Customers.findOne({
+    where: {
+      customerCode: customer_code,
+    },
+  });
+
+  if (!isexistCustomers || isexistCustomers === null) {
+    isexistCustomers = await Customers.create({
+      customerCode: customer_code,
+    });
+  }
+  console.log(isexistCustomers, 'veirifando se o erro esta aqui ')
+  await Measures.create({
+    image: image_url,
+    customerId: isexistCustomers.id,
     measureDatetime: measure_datatime,
     measureType: measure_type,
     measure_value: Number(measure_value),

@@ -5,23 +5,24 @@ import {
   InferCreationAttributes,
   CreationOptional,
 } from "sequelize";
+import Customers from "./Customers.models";
 import db from "./index";
 
-class UploadImage extends Model<
-  InferAttributes<UploadImage>,
-  InferCreationAttributes<UploadImage>
+class Measures extends Model<
+  InferAttributes<Measures>,
+  InferCreationAttributes<Measures>
 > {
   declare id: CreationOptional<number>;
   declare image: string;
-  declare customerCode: string;
   declare measureDatetime: Date;
   declare measureType: string;
   declare value_confirmed: boolean;
   declare measure_uuid: string;
   declare measure_value: number;
+  declare customerId: number;
 }
 
-UploadImage.init(
+Measures.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -29,14 +30,17 @@ UploadImage.init(
       primaryKey: true,
       autoIncrement: true,
     },
+    customerId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Customers,
+        key: "id",
+      },
+    },
     image: {
       type: DataTypes.TEXT,
       allowNull: false,
-    },
-    customerCode: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      field: "customer_code",
     },
     measureDatetime: {
       type: DataTypes.DATE,
@@ -63,10 +67,13 @@ UploadImage.init(
   },
   {
     sequelize: db,
-    tableName: "uploads",
-    modelName: "uploadImage",
+    tableName: "measures",
+    modelName: "measures",
     timestamps: false,
   }
 );
 
-export default UploadImage;
+Customers.hasMany(Measures, { foreignKey: "customerId" , as: "measures"});
+Measures.belongsTo(Customers, { foreignKey: "customerId", as: "customer" });
+
+export default Measures;
